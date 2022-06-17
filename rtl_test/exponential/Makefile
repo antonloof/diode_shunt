@@ -4,6 +4,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 
+WAVES = 1
 VERILOG_SOURCES += $(PWD)/../../rtl/hyperbolic_exp_cordic.v
 # use VHDL_SOURCES for VHDL files
 
