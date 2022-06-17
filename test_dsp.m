@@ -37,6 +37,6 @@ end
 loglog(id_true, abs((icalc-id_true)./id_true))
 xlim([1e-9 100])
 grid on
-
-
-
+%%
+y = cordicexp(0.1, 16);
+lookup = round(atanh(2.^(-(1:16)))*2^(16-1))
