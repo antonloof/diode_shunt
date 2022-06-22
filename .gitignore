@@ -24,3 +24,8 @@ fp-info-cache
 # Exported BOM files
 *.xml
 *.csv
+
+# cocotb stuffs
+*.pyc
+**/sim_build/*
+**/results.xml
