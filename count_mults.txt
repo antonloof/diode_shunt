@@ -1,0 +1,19 @@
+does not include scaling numbers to convergence 
+
+invert (n iters):
+    muls: 1+2*n
+    adds: 1+n
+    scale: 
+        mul: 2?
+
+exp:
+    muls: 0
+    adds: 2*n
+    scale:
+        mul: 2?
+
+newton:
+    exp: n 
+    invert: n
+    mul: 3n
+    add: 2n

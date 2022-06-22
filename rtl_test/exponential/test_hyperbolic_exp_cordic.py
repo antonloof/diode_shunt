@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-
-import cocotb
-from cocotb.triggers import Timer
-
-
-@cocotb.test()
-async def my_first_test(dut):
-    """Try accessing the design."""
-
-    for cycle in range(10):
-        dut.clk.value = 0
-        await Timer(1, units="ns")
-        dut.clk.value = 1
-        await Timer(1, units="ns")
-=======
 from curses.ascii import RS
 import cocotb
 from cocotb.triggers import Timer
@@ -67,11 +51,11 @@ def generator_constant(c):
 
 
 def to_2s_comp(f):
-    return round(f * 2**14) & 0xFFFF
+    return round(f * 2 ** 14) & 0xFFFF
 
 
 def from_2s_comp(i):
-    return (-(i & 0x8000) + (i & 0x7FFF)) / 2**14
+    return (-(i & 0x8000) + (i & 0x7FFF)) / 2 ** 14
 
 
 @cocotb.test()
@@ -91,4 +75,3 @@ async def test_an_exponential(dut):
 
     calc = from_2s_comp(dut.w.value)
     print(abs(exp(val) - calc), to_2s_comp(val))
->>>>>>> 95e5358249cf2458d7ee60220327f8728685483d
