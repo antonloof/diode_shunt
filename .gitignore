@@ -29,3 +29,4 @@ fp-info-cache
 *.pyc
 **/sim_build/*
 **/results.xml
+*.vcd
