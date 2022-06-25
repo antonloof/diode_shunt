@@ -7,6 +7,7 @@ from math import floor, log2
 
 import sys
 from os import path
+import numpy as np
 
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
@@ -56,12 +57,16 @@ async def test_inverse_of_a_lots_of_random(dut):
             await RisingEdge(dut.clk)
 
         res.append((from_special_float(dut.out.value), dut.out.value, val, to_send))
-    log_error = [log2((abs(r[0] - 1 / r[2]) * r[2])) for r in res]
+
+    log_error = [np.log2((abs(r[0] - 1 / r[2]) * r[2])) for r in res]
+    for err in log_error:
+        assert err < -13
     plt.hist(log_error, 50)
+    plt.xlim(-20, -12)
     plt.savefig("foo.png")
 
 
-# @cocotb.test()
+@cocotb.test()
 async def test_inverse_of_a_number(dut):
     driver = AxiDriver(
         clk=dut.clk, data=dut.d, valid=dut.in_valid, ready=dut.in_ready, valid_generator=generator_constant(0)
@@ -75,7 +80,7 @@ async def test_inverse_of_a_number(dut):
 
     for _ in range(30):
         await clk
-    err_log = log2(abs(from_special_float(dut.out.value) - 1 / val) * val)
+    err_log = np.log2(abs(from_special_float(dut.out.value) - 1 / val) * val)
     assert (
-        err_log < -12
-    ), f"should be less than -12 log2 relative error 1/{val}={1/val} !~= {from_special_float(dut.out.value)}"
+        err_log < -13
+    ), f"should be less than -13 log2 relative error 1/{val}={1/val} !~= {from_special_float(dut.out.value)}"

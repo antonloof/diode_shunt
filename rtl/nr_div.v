@@ -23,19 +23,19 @@ module nr_div (
     localparam STATE_ITTERATING = 2;
     localparam STATE_DONE = 3;
     localparam FIX_POINT_LOCATION = 15;
-    // fixed point with 2.14 unsigned numbers
-    localparam CONST_48_OVER_17 = 46261;
-    localparam CONST_32_OVER_17 = 30840;
-    localparam CONST_2 = 32'h80000000;
+
+    localparam CONST_48_OVER_17 = 32'd3031741621; // 2u30
+    localparam CONST_32_OVER_17 = 16'd61681; // 1u15
+    localparam CONST_2 = 32'h80000000; // 2u30
     
 
 
-    reg [MANTISSA_W-1:0] d_man;
+    reg [MANTISSA_W-1:0] d_man; // 1u15
     // sufficient for 16x16 multiplication
-    reg [31:0] z;
-    reg [31:0] ztemp;
+    reg [31:0] z; // 2u30
+    reg [31:0] ztemp; // 2u30
 
-    reg signed [EXP_W-1:0] d_exp;
+    reg signed [EXP_W-1:0] d_exp; // 8s
     reg d_sign;
 
     reg [ITERATION_CNT_W-1:0] i;
@@ -64,8 +64,7 @@ module nr_div (
                 end
            
             end else if (state == STATE_APPROXIMATE) begin
-                // utilize more bits for whole numbers for this add, then discard them
-                z <= ((CONST_48_OVER_17 << (FIX_POINT_LOCATION + 1)) - ((CONST_32_OVER_17 << 1) * d_man));
+                z <= CONST_48_OVER_17 - (CONST_32_OVER_17 * d_man);
                 state <= STATE_ITTERATING;
 
             end else if (state == STATE_ITTERATING) begin
@@ -91,6 +90,7 @@ module nr_div (
             end
         end
     end
+    
 // cocotb signal dump
 `ifdef COCOTB_SIM
     initial begin
