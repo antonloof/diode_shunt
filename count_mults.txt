@@ -14,6 +14,6 @@ exp:
 
 newton:
     exp: n 
-    invert: n
+    invert: 2n
     mul: 3n
-    add: 2n
+    add: 4n
