@@ -20,7 +20,6 @@ class AxiDriver(Driver):
     async def _driver_send(self, transaction, sync=True, **kwargs):
         clock = RisingEdge(self.clk)
 
-        await clock
         self.valid.value = 1
         self.data.value = transaction
 

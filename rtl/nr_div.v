@@ -10,10 +10,10 @@ module nr_div (
     output reg out_valid,
     input out_ready
 );
-    localparam MANTISSA_W = 15;
+    localparam MANTISSA_W = 16;
     localparam EXP_W = 8;
     localparam ITERATION_COUNT = 4;
-    localparam ITERATION_CNT_W = 3;
+    localparam ITERATION_CNT_W = 2;
     localparam MANTISSA_W_CLOG2 = 4;
 
 
@@ -22,15 +22,15 @@ module nr_div (
     localparam STATE_APPROXIMATE = 1;
     localparam STATE_ITTERATING = 2;
     localparam STATE_DONE = 3;
-    localparam FIX_POINT_LOCATION = 14;
+    localparam FIX_POINT_LOCATION = 15;
     // fixed point with 2.14 unsigned numbers
     localparam CONST_48_OVER_17 = 46261;
     localparam CONST_32_OVER_17 = 30840;
-    localparam CONST_2 = 32768;
+    localparam CONST_2 = 32'h80000000;
     
 
 
-    reg [MANTISSA_W:0] d_man;
+    reg [MANTISSA_W-1:0] d_man;
     // sufficient for 16x16 multiplication
     reg [31:0] z;
     reg [31:0] ztemp;
@@ -53,21 +53,25 @@ module nr_div (
             
         end else begin
             if (state == STATE_IDLE) begin
+                out_valid <= 0;
+
                 if (in_ready && in_valid) begin
-                    d_man <= {2'b0, ({(MANTISSA_W-1){d[MANTISSA_W+EXP_W-1]}} ^ d[MANTISSA_W-2+EXP_W:EXP_W]) + d[MANTISSA_W+EXP_W-1]};
+                    d_man <= ({(MANTISSA_W){d[MANTISSA_W+EXP_W-1]}} ^ d[MANTISSA_W+EXP_W-1:EXP_W]) + d[MANTISSA_W+EXP_W-1];
                     d_exp <= d[EXP_W-1:0];
                     d_sign <= d[MANTISSA_W+EXP_W-1];
                     state <= STATE_APPROXIMATE;
+                    in_ready <= 0;
                 end
            
             end else if (state == STATE_APPROXIMATE) begin
-                z <= ((CONST_48_OVER_17 << FIX_POINT_LOCATION) - ((CONST_32_OVER_17 * d_man)));
+                // utilize more bits for whole numbers for this add, then discard them
+                z <= ((CONST_48_OVER_17 << (FIX_POINT_LOCATION + 1)) - ((CONST_32_OVER_17 << 1) * d_man));
                 state <= STATE_ITTERATING;
 
             end else if (state == STATE_ITTERATING) begin
                 i <= i+1;
                 if (i[0] == 1'b0) begin
-                    ztemp <= (CONST_2 << FIX_POINT_LOCATION) - (d_man * (z >> FIX_POINT_LOCATION));
+                    ztemp <= CONST_2-(d_man * (z >> FIX_POINT_LOCATION));
                 end else begin
                     z <= ((z >> FIX_POINT_LOCATION) * (ztemp >> FIX_POINT_LOCATION));
                 end
@@ -78,10 +82,11 @@ module nr_div (
            
             end else if (state == STATE_DONE) begin
                 out_valid <= 1;
-                out[MANTISSA_W+EXP_W-1:EXP_W] <= ({MANTISSA_W{d_sign}} ^ (z[29:29-MANTISSA_W+1])) + d_sign;
+                out[MANTISSA_W+EXP_W-1:EXP_W] <= ({MANTISSA_W{d_sign}} ^ (z[31:31-MANTISSA_W+1])) + d_sign;
                 out[EXP_W-1:0] <= -d_exp + 1'b1;
                 if (out_ready <= 1) begin
                     state <= STATE_IDLE;
+                    in_ready <= 1;
                 end
             end
         end

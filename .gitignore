@@ -30,3 +30,4 @@ fp-info-cache
 **/sim_build/*
 **/results.xml
 *.vcd
+*.png
