@@ -1,7 +1,7 @@
 function [x] = numerical_solve(vmeas,div_iter,exp_iter,newton_iter,rs,vt,i0)
 %NUMERICAL_SOLVE Summary of this function goes here
 %   Detailed explanation goes here
-    f_prim = @(i) -i0 * nr_div(rs, vt, div_iter) * cordicexp(nr_div(vmeas-i*rs, vt, div_iter), exp_iter) - 1;
+    f_prim = @(i) -i0 * rs * nr_div(1, vt, div_iter) * cordicexp(nr_div(vmeas-i*rs, vt, div_iter), exp_iter) - 1;
     f = @(i) i0 * (cordicexp(nr_div(vmeas-i*rs, vt, div_iter), exp_iter) - 1) - i;
     
     x = nr_div(vmeas, rs, 2);

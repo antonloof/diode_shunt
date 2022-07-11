@@ -14,6 +14,9 @@ exp:
 
 newton:
     exp: n 
-    invert: 2n
+    invert: n
     mul: 3n
-    add: 4n
+    add: 2n
+
+total:
+    mul: n_newton*()
